@@ -4,17 +4,14 @@
 #include <MirfHardwareSpiDriver.h>
  
 int rate;
-boolean ledState = false;
-int buttonState = 0;
-const int switchPin = 4; //connect the switch on digital pin 4
-const int ledPin = 5;
+const int soundPin = 3;
 
 void setup(){
  
   Serial.begin(9600);
-  pinMode(switchPin, INPUT);
   pinMode(ledPin, OUTPUT);
-  
+  pinMode(soundPin, OUTPUT);
+  digitalWrite(soundPin, HIGH);
   Mirf.spi = &MirfHardwareSpi;
   Mirf.init();
   Mirf.setRADDR((byte *)"serv1");
@@ -28,20 +25,15 @@ void setup(){
 }
  
 void loop(){
-  buttonState = digitalRead(switchPin);
-  
-  if(buttonState == LOW){
-    digitalWrite(ledPin, HIGH);
     while(!Mirf.dataReady()){
     }
     Mirf.getData((byte *) &rate);
    
-    Serial.println(rate);
-    delay(21);
-  }
-  else{
-    delay(100);
-    ledState = !ledState;
-    digitalWrite(ledPin, ledState);
-  }
+    Serial.println(rate); 
+    if(rate == 100){
+      digitalWrite(soundPin, LOW);
+      delay(15);
+      digitalWrite(soundPin, HIGH);
+    }
+    delay(15);
 }
